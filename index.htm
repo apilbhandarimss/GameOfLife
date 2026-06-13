@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game of Life - C++ Implementation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: white;
+        }
+
+        header {
+            background: #1a1a1a;
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 1em;
+            color: #ccc;
+            font-style: italic;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 30px;
+        }
+
+        section {
+            background: white;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        section h2 {
+            font-size: 1.6em;
+            margin-bottom: 25px;
+            color: #000;
+            font-weight: normal;
+            padding-bottom: 5px;
+        }
+
+        section h3 {
+            font-size: 1.1em;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            color: #222;
+            font-weight: normal;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .code-block {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 0;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75em;
+            line-height: 1.6;
+            color: #222;
+            white-space: pre;
+            position: relative;
+        }
+
+        .code-block-wrapper {
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 6px 12px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.7em;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .copy-btn:hover {
+            background: #555;
+        }
+
+        .code-highlight {
+            background: #e0e0e0;
+            padding: 0px 3px;
+            border-radius: 0;
+            font-family: 'Courier New', monospace;
+            color: #222;
+        }
+
+        .prerequisites {
+            background: white;
+            border: none;
+            padding: 0;
+            margin: 20px 0;
+            border-radius: 0;
+        }
+
+        .prerequisites h3 {
+            margin-top: 20px;
+        }
+
+        .prerequisites ul {
+            list-style: disc;
+            padding-left: 25px;
+        }
+
+        .prerequisites li {
+            margin-bottom: 8px;
+            padding-left: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 25px;
+            border: 1px solid #333;
+            background: white;
+            color: #333;
+            border-radius: 0;
+            font-size: 0.95em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: normal;
+            text-align: center;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .btn-demo {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        .btn-demo:hover {
+            background: #555;
+            border-color: #555;
+        }
+
+        .btn-code {
+            background: #555;
+            color: white;
+            border-color: #555;
+        }
+
+        .btn-code:hover {
+            background: #777;
+            border-color: #777;
+        }
+
+        .explanation {
+            background: white;
+            padding: 0;
+            margin: 15px 0;
+            border-left: none;
+            border-radius: 0;
+        }
+
+        .function-section {
+            background: white;
+            padding: 0;
+            margin: 20px 0;
+            border-radius: 0;
+            border: none;
+        }
+
+        footer {
+            background: #333;
+            color: #999;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 50px;
+            font-size: 0.9em;
+        }
+
+        .demo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .demo-modal.active {
+            display: flex;
+        }
+
+        .demo-content {
+            background: white;
+            padding: 30px;
+            border-radius: 0;
+            max-width: 85%;
+            max-height: 85%;
+            overflow: auto;
+            position: relative;
+            border: 1px solid #ccc;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: #666;
+            background: none;
+            border: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background: #f0f0f0;
+            font-weight: normal;
+        }
+
+        ul {
+            margin-left: 25px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        ol {
+            margin-left: 25px;
+        }
+
+        ol li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Conway's Game of Life</h1>
+        <p>A C++ Implementation with Raylib - Complete Code Breakdown</p>
+    </header>
+
+    <div class="container">
+        <!-- Includes Section -->
+        <section>
+            <h2>Understanding the Includes</h2>
+            <p>Let's start with the first few lines of the code - the header includes. These tell the compiler what libraries and functionalities we need.</p>
+            
+            <div class="code-block-wrapper">
+                <button class="copy-btn" onclick="copyCode('code1')">Copy</button>
+                <div class="code-block" id="code1">#include&lt;iostream&gt;
+#include&lt;cstdlib&gt;
+#include"raylib.h"</div>
+            </div>
+
+            <h3>#include&lt;iostream&gt;</h3>
+            <div class="explanation">
+                <strong>Purpose:</strong> This header provides input/output stream functionality. In our Game of Life, we might not directly use cout or cin, but it's included as a standard practice for C++ programs. It allows console output for debugging.
+            </div>
+
+            <h3>#include&lt;cstdlib&gt;</h3>
+            <div class="explanation">
+                <strong>Purpose:</strong> This header provides the <span class="code-highlight">rand()</span> function, which we use to randomly initialize our grid with living and dead cells. <span class="code-highlight">rand()%2</span> gives us 0 or 1 randomly.
+            </div>
+
+            <h3>#include"raylib.h"</h3>
+            <div class="explanation">
+                <strong>Purpose:</strong> Raylib is a graphics library that handles window creation, drawing, and input. Notice the double quotes instead of angle brackets - this means it's a local library, not a system library. We use it to draw the grid, handle window events, and manage the display.
+            </div>
+        </section>
+
+        <!-- Macros and Grid -->
+        <section>
+            <h2>Grid Configuration & Macros</h2>
+            <div class="code-block-wrapper">
+                <button class="copy-btn" onclick="copyCode('code2')">Copy</button>
+                <div class="code-block" id="code2">#define rows 200
+#define col 300
+#define cell_size 5
+int grid[rows][col];</div>
+            </div>
+
+            <p>These macros define the dimensions of our cellular automaton:</p>
+            <ul style="list-style: none; padding-left: 0;">
+                <li style="margin-bottom: 10px;"><span class="code-highlight">rows = 200</span> - The grid has 200 rows</li>
+                <li style="margin-bottom: 10px;"><span class="code-highlight">col = 300</span> - The grid has 300 columns</li>
+                <li style="margin-bottom: 10px;"><span class="code-highlight">cell_size = 5</span> - Each cell is 5 pixels on the screen</li>
+                <li style="margin-bottom: 10px;"><span class="code-highlight">grid[200][300]</span> - Our 2D array where 1 = alive cell, 0 = dead cell</li>
+            </ul>
+
+            <p><strong>Note:</strong> The total window size will be 300 × 5 = 1500 pixels wide and 200 × 5 = 1000 pixels tall.</p>
+        </section>
+
+        <!-- Core Functions -->
+        <section>
+            <h2>Core Functions Explained</h2>
+
+            <h3>1. countNeig(int r, int c)</h3>
+            <div class="function-section">
+                <p>This function counts the number of living neighbors around a cell at position (r, c).</p>
+                <div class="code-block-wrapper">
+                    <button class="copy-btn" onclick="copyCode('code3')">Copy</button>
+                    <div class="code-block" id="code3">int countNeig(int r, int c)
+{
+    int count = 0;
+    for(int dr = -1; dr <= 1; dr++)
+    {
+        for(int dc = -1; dc <= 1; dc++)
+        {
+            if(dr == 0 && dc == 0) continue;
+            int nr = (r + dr + rows) % rows;
+            int nc = (c + dc + col) % col;
+            count += grid[nr][nc];
+        }
+    }
+    return count;
+}</div>
+                </div>
+                <div class="explanation">
+                    <strong>How it works:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Loops through all 8 surrounding neighbors (dr and dc range from -1 to 1)</li>
+                        <li>Skips the center cell (when dr==0 and dc==0)</li>
+                        <li>Uses modulo arithmetic <span class="code-highlight">(r + dr + rows) % rows</span> to wrap around edges (torus topology)</li>
+                        <li>Counts living neighbors (grid value = 1)</li>
+                        <li>Returns the count (0-8)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>2. nextSim()</h3>
+            <div class="function-section">
+                <p>This is where Conway's Game of Life rules are applied!</p>
+                <div class="code-block-wrapper">
+                    <button class="copy-btn" onclick="copyCode('code4')">Copy</button>
+                    <div class="code-block" id="code4">void nextSim()
+{
+    int next[rows][col];
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < col; c++)
+        {
+            int negi = countNeig(r, c);
+            if(grid[r][c] == 1)
+            {
+                next[r][c] = (negi == 2 || negi == 3) ? 1 : 0;
+            }
+            else next[r][c] = (negi == 3) ? 1 : 0;
+        }
+    }
+    for(int r = 0; r < rows; r++)
+        for(int c = 0; c < col; c++)
+            grid[r][c] = next[r][c];
+}</div>
+                </div>
+                <div class="explanation">
+                    <strong>Conway's Rules:</strong>
+                    <table>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Rule</th>
+                            <th>Result</th>
+                        </tr>
+                        <tr>
+                            <td>Live cell with 2-3 neighbors</td>
+                            <td>Stays alive</td>
+                            <td>Survives</td>
+                        </tr>
+                        <tr>
+                            <td>Live cell with <2 or >3 neighbors</td>
+                            <td>Dies (underpopulation/overpopulation)</td>
+                            <td>Dies</td>
+                        </tr>
+                        <tr>
+                            <td>Dead cell with exactly 3 neighbors</td>
+                            <td>Becomes alive (reproduction)</td>
+                            <td>Born</td>
+                        </tr>
+                        <tr>
+                            <td>Dead cell with other neighbor counts</td>
+                            <td>Stays dead</td>
+                            <td>Stays dead</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <h3>3. randomize()</h3>
+            <div class="function-section">
+                <p>Initializes the grid with random alive/dead cells.</p>
+                <div class="code-block-wrapper">
+                    <button class="copy-btn" onclick="copyCode('code5')">Copy</button>
+                    <div class="code-block" id="code5">void randomize()
+{
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < col; c++)
+        {
+            grid[r][c] = rand() % 2;
+        }
+    }
+}</div>
+                </div>
+                <div class="explanation">
+                    <strong>Explanation:</strong> Creates a random initial state by setting each cell to either 0 (dead) or 1 (alive). <span class="code-highlight">rand() % 2</span> gives a random 0 or 1.
+                </div>
+            </div>
+
+            <h3>4. drawGrid()</h3>
+            <div class="function-section">
+                <p>Renders the grid on the screen using Raylib.</p>
+                <div class="code-block-wrapper">
+                    <button class="copy-btn" onclick="copyCode('code6')">Copy</button>
+                    <div class="code-block" id="code6">void drawGrid()
+{
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < col; c++)
+        {
+            Color color = grid[r][c] ? GREEN : BLACK;
+            DrawRectangle(c*cell_size, r*cell_size, 
+                         cell_size-1, cell_size-1, color);
+        }
+    }
+}</div>
+                </div>
+                <div class="explanation">
+                    <strong>Explanation:</strong> For each cell, draws a colored rectangle. If the cell is alive (1), it's GREEN; if dead (0), it's BLACK. Each rectangle is positioned at <span class="code-highlight">(c*cell_size, r*cell_size)</span> and sized <span class="code-highlight">cell_size-1</span> for a grid effect.
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Loop -->
+        <section>
+            <h2>The Main Loop</h2>
+            <div class="code-block-wrapper">
+                <button class="copy-btn" onclick="copyCode('code7')">Copy</button>
+                <div class="code-block" id="code7">int main()
+{
+    InitWindow(col*cell_size, rows*cell_size, "Game_OF_Life");
+    SetTargetFPS(160);
+    randomize();
+    int framecount = 0;
+    int speed = 5;
+    
+    while(!WindowShouldClose())
+    {
+        framecount++;
+        if(framecount >= speed)
+        {
+            nextSim();
+            framecount = 0;
+        }
+        BeginDrawing();
+        ClearBackground(BLACK);
+        drawGrid();
+        EndDrawing();
+    }
+    CloseWindow();
+}</div>
+            </div>
+
+            <h3>Step-by-step Breakdown:</h3>
+            <div class="function-section">
+                <p><strong>1. InitWindow():</strong> Creates a window with width = 300×5 = 1500 pixels and height = 200×5 = 1000 pixels</p>
+                <p><strong>2. SetTargetFPS(160):</strong> Targets 160 frames per second for smooth rendering</p>
+                <p><strong>3. randomize():</strong> Sets up initial random cell states</p>
+                <p><strong>4. Main Loop:</strong> Continues while window is open</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><span class="code-highlight">framecount++</span> - Increments frame counter</li>
+                    <li><span class="code-highlight">if(framecount >= speed)</span> - Updates simulation every 5 frames (slower than rendering)</li>
+                    <li><span class="code-highlight">BeginDrawing() / EndDrawing()</span> - Raylib drawing commands</li>
+                    <li><span class="code-highlight">ClearBackground(BLACK)</span> - Clears screen each frame</li>
+                    <li><span class="code-highlight">drawGrid()</span> - Draws the current state</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>5. CloseWindow():</strong> Cleans up and closes the window</p>
+            </div>
+        </section>
+
+        <!-- Prerequisites -->
+        <section>
+            <h2>Prerequisites & Setup</h2>
+            <div class="prerequisites">
+                <h3>Required Libraries & Tools:</h3>
+                <ul>
+                    <li><strong>C++ Compiler:</strong> GCC, Clang, or MSVC (C++11 or later)</li>
+                    <li><strong>Raylib:</strong> Graphics library for rendering and window management</li>
+                    <li><strong>CMake or Make:</strong> Build tools (optional but recommended)</li>
+                </ul>
+
+                <h3 style="margin-top: 25px;">Installation Instructions:</h3>
+                <ul>
+                    <li><strong>Linux:</strong> <span class="code-highlight">sudo apt-get install libraylib-dev</span></li>
+                    <li><strong>macOS:</strong> <span class="code-highlight">brew install raylib</span></li>
+                    <li><strong>Windows:</strong> Download from <a href="https://www.raylib.com/" target="_blank">raylib.com</a></li>
+                </ul>
+
+                <h3 style="margin-top: 25px;">Compilation:</h3>
+                <div class="code-block-wrapper">
+                    <button class="copy-btn" onclick="copyCode('code8')">Copy</button>
+                    <div class="code-block" id="code8"># Simple compilation
+g++ -o game_of_life game_of_life.cpp -lraylib -lm
+
+# Or with additional flags
+g++ -std=c++11 -O2 -o game_of_life game_of_life.cpp -lraylib -lm</div>
+                </div>
+
+                <h3 style="margin-top: 25px;">Running the Program:</h3>
+                <div class="code-block-wrapper">
+                    <button class="copy-btn" onclick="copyCode('code9')">Copy</button>
+                    <div class="code-block" id="code9">./game_of_life</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Options -->
+        <section>
+            <h2>Explore Further</h2>
+            <p>Ready to dive deeper into the Game of Life? Choose one of the options below:</p>
+            
+            <div class="button-group">
+                <button class="btn btn-demo" onclick="openDemo()">See Interactive Demo</button>
+                <button class="btn btn-code" onclick="openCodeEditor()">Try the Code Yourself</button>
+            </div>
+
+            <p style="margin-top: 30px; color: #666; font-style: italic;">The interactive demo shows how patterns evolve over time. Try modifying the speed variable or grid size to see different behaviors!</p>
+        </section>
+
+        <!-- Key Concepts -->
+        <section>
+            <h2>Key Concepts to Remember</h2>
+            <div class="function-section">
+                <h3>Cellular Automaton</h3>
+                <p>A discrete model where each cell can be in one of a finite number of states, and the state of each cell changes over time based on its current state and its neighbors' states.</p>
+            </div>
+
+            <div class="function-section">
+                <h3>Toroidal Grid (Wrapping)</h3>
+                <p>The modulo operator makes the grid wrap around at edges. Cells on the right edge have the left edge as neighbors. This creates a universe without boundaries.</p>
+            </div>
+
+            <div class="function-section">
+                <h3>Synchronous Updates</h3>
+                <p>All cells update simultaneously based on the previous generation's state. This is why we use a separate <span class="code-highlight">next</span> array instead of updating the original grid directly.</p>
+            </div>
+
+            <div class="function-section">
+                <h3>Visual Representation</h3>
+                <p>Green cells are alive, black cells are dead. This simple visual makes it easy to spot patterns like gliders, blinkers, and beehives.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modals -->
+    <div id="demoModal" class="demo-modal">
+        <div class="demo-content" style="max-width: 600px;">
+            <span class="close-btn" onclick="closeDemo()">&times;</span>
+            <h2>Interactive Game of Life Demo</h2>
+            <p>Watch the simulation in action. Green cells are alive, black cells are dead.</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <canvas id="demoCanvas" width="400" height="300" style="border: 1px solid #333; background: #000; display: block; margin: 0 auto;"></canvas>
+            </div>
+            <div style="margin: 15px 0; padding: 10px; background: #f5f5f5;">
+                <p style="margin: 5px 0; font-size: 0.9em;"><strong>Generation:</strong> <span id="generationCount">0</span></p>
+                <p style="margin: 5px 0; font-size: 0.9em;"><strong>Population:</strong> <span id="populationCount">0</span> cells</p>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn" onclick="startDemo()" style="background: #333; color: white; border-color: #333;">Play</button>
+                <button class="btn" onclick="pauseDemo()" style="background: #333; color: white; border-color: #333;">Pause</button>
+                <button class="btn" onclick="resetDemo()" style="background: #555; color: white; border-color: #555;">Reset</button>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #666;">The simulation uses Conway's rules: a live cell with 2-3 neighbors survives, a dead cell with exactly 3 neighbors becomes alive.</p>
+        </div>
+    </div>
+
+    <div id="codeModal" class="demo-modal">
+        <div class="demo-content">
+            <span class="close-btn" onclick="closeCodeEditor()">&times;</span>
+            <h2>Try the Code Yourself</h2>
+            <p>Here's the complete code ready to copy. Follow these steps:</p>
+            <ol style="margin-left: 20px; margin-bottom: 20px;">
+                <li>Copy the code below</li>
+                <li>Save it as <span class="code-highlight">game_of_life.cpp</span></li>
+                <li>Make sure Raylib is installed</li>
+                <li>Compile: <span class="code-highlight">g++ -o game_of_life game_of_life.cpp -lraylib -lm</span></li>
+                <li>Run: <span class="code-highlight">./game_of_life</span></li>
+            </ol>
+            <div class="code-block-wrapper">
+                <button class="copy-btn" onclick="copyCode('fullCode')">Copy</button>
+                <div class="code-block" id="fullCode">#include&lt;iostream&gt;
+#include&lt;cstdlib&gt;
+#include"raylib.h"
+#define rows 200
+#define col 300
+#define cell_size 5
+int grid[rows][col];
+
+int countNeig(int r, int c)
+{
+    int count = 0;
+    for(int dr = -1; dr <= 1; dr++)
+    {
+        for(int dc = -1; dc <= 1; dc++)
+        {
+            if(dr == 0 && dc == 0) continue;
+            int nr = (r + dr + rows) % rows;
+            int nc = (c + dc + col) % col;
+            count += grid[nr][nc];
+        }
+    }
+    return count;
+}
+
+void nextSim()
+{
+    int next[rows][col];
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < col; c++)
+        {
+            int negi = countNeig(r, c);
+            if(grid[r][c] == 1)
+            {
+                next[r][c] = (negi == 2 || negi == 3) ? 1 : 0;
+            }
+            else next[r][c] = (negi == 3) ? 1 : 0;
+        }
+    }
+    for(int r = 0; r < rows; r++)
+        for(int c = 0; c < col; c++)
+            grid[r][c] = next[r][c];
+}
+
+void randomize()
+{
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < col; c++)
+        {
+            grid[r][c] = rand() % 2;
+        }
+    }
+}
+
+void drawGrid()
+{
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < col; c++)
+        {
+            Color color = grid[r][c] ? GREEN : BLACK;
+            DrawRectangle(c*cell_size, r*cell_size, 
+                         cell_size-1, cell_size-1, color);
+        }
+    }
+}
+
+int main()
+{
+    InitWindow(col*cell_size, rows*cell_size, "Game_OF_Life");
+    SetTargetFPS(160);
+    randomize();
+    int framecount = 0;
+    int speed = 5;
+    
+    while(!WindowShouldClose())
+    {
+        framecount++;
+        if(framecount >= speed)
+        {
+            nextSim();
+            framecount = 0;
+        }
+        BeginDrawing();
+        ClearBackground(BLACK);
+        drawGrid();
+        EndDrawing();
+    }
+    CloseWindow();
+    return 0;
+}</div>
+            </div>
+            <p style="margin-top: 20px; color: #666;"><strong>Tips for modification:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Change <span class="code-highlight">rows</span> and <span class="code-highlight">col</span> for different grid sizes</li>
+                <li>Adjust <span class="code-highlight">speed</span> (try 1-20) to slow down or speed up evolution</li>
+                <li>Change <span class="code-highlight">GREEN</span> to other colors like <span class="code-highlight">YELLOW</span>, <span class="code-highlight">WHITE</span>, <span class="code-highlight">BLUE</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Game of Life Educational Guide | Built with minimalist design principles</p>
+        <p>Conway's Game of Life - A cellular automaton by John Horton Conway (1970)</p>
+    </footer>
+
+    <script>
+        function copyCode(elementId) {
+            let codeBlock = document.getElementById(elementId);
+            let text = codeBlock.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                let btn = codeBlock.parentElement.querySelector('.copy-btn');
+                let originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Game of Life Demo
+        let demoGrid = [];
+        let demoRows = 30;
+        let demoCols = 40;
+        let cellSize = 10;
+        let demoRunning = false;
+        let demoGeneration = 0;
+        let demoSpeed = 200;
+
+        function initDemoGrid() {
+            demoGrid = [];
+            for (let r = 0; r < demoRows; r++) {
+                demoGrid[r] = [];
+                for (let c = 0; c < demoCols; c++) {
+                    demoGrid[r][c] = Math.random() < 0.2 ? 1 : 0;
+                }
+            }
+            demoGeneration = 0;
+            drawDemoGrid();
+        }
+
+        function drawDemoGrid() {
+            let canvas = document.getElementById('demoCanvas');
+            if (!canvas) return;
+            
+            let ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff00';
+            for (let r = 0; r < demoRows; r++) {
+                for (let c = 0; c < demoCols; c++) {
+                    if (demoGrid[r][c] === 1) {
+                        ctx.fillRect(c * cellSize, r * cellSize, cellSize - 1, cellSize - 1);
+                    }
+                }
+            }
+            
+            updateDemoStats();
+        }
+
+        function countNeighbors(r, c) {
+            let count = 0;
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    if (dr === 0 && dc === 0) continue;
+                    let nr = (r + dr + demoRows) % demoRows;
+                    let nc = (c + dc + demoCols) % demoCols;
+                    count += demoGrid[nr][nc];
+                }
+            }
+            return count;
+        }
+
+        function updateDemoGeneration() {
+            let nextGrid = [];
+            for (let r = 0; r < demoRows; r++) {
+                nextGrid[r] = [];
+                for (let c = 0; c < demoCols; c++) {
+                    let neighbors = countNeighbors(r, c);
+                    if (demoGrid[r][c] === 1) {
+                        nextGrid[r][c] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+                    } else {
+                        nextGrid[r][c] = (neighbors === 3) ? 1 : 0;
+                    }
+                }
+            }
+            demoGrid = nextGrid;
+            demoGeneration++;
+            drawDemoGrid();
+        }
+
+        function updateDemoStats() {
+            let population = 0;
+            for (let r = 0; r < demoRows; r++) {
+                for (let c = 0; c < demoCols; c++) {
+                    population += demoGrid[r][c];
+                }
+            }
+            document.getElementById('generationCount').textContent = demoGeneration;
+            document.getElementById('populationCount').textContent = population;
+        }
+
+        let demoInterval;
+
+        function startDemo() {
+            if (demoRunning) return;
+            demoRunning = true;
+            demoInterval = setInterval(updateDemoGeneration, demoSpeed);
+        }
+
+        function pauseDemo() {
+            demoRunning = false;
+            clearInterval(demoInterval);
+        }
+
+        function resetDemo() {
+            pauseDemo();
+            initDemoGrid();
+        }
+
+        function openDemo() {
+            document.getElementById('demoModal').classList.add('active');
+            initDemoGrid();
+            startDemo();
+        }
+
+        function closeDemo() {
+            pauseDemo();
+            document.getElementById('demoModal').classList.remove('active');
+        }
+
+        function openCodeEditor() {
+            document.getElementById('codeModal').classList.add('active');
+        }
+
+        function closeCodeEditor() {
+            document.getElementById('codeModal').classList.remove('active');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            let demoModal = document.getElementById('demoModal');
+            let codeModal = document.getElementById('codeModal');
+            
+            if (event.target == demoModal) {
+                demoModal.classList.remove('active');
+            }
+            if (event.target == codeModal) {
+                codeModal.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
